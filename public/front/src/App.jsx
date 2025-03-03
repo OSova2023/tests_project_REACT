@@ -104,8 +104,7 @@ function App() {
   //               prev.map(item =>{ return {...item, site: sites.filter(site => site.id === item.siteId)?.exName}}));
   //       } catch (err) {
   //         console.error('Error fetching data:', err);
-  //       }
-              
+  //       }           
     
   //   }
   //   fetchData()     
@@ -158,8 +157,9 @@ function App() {
           :
           <div className='main'>          
             <div>
-              <div className='flex flex-row justify-between items-center'>
-                {titleList.map(item => <div key={item} onClick={()=>{handleListFilter(item.toLowerCase())}} className='main__titles-list cursor-pointer'>{item}</div>)}
+              <div className='main__titles-list grid grid-cols-8 w-full gap-3'>
+                {titleList.map(item => <div key={item} onClick={()=>{handleListFilter(item.toLowerCase())}} className={`main__titles cursor-pointer ${item === 'NAME' ? 'col-span-3' : 'col-span-1'}`}
+                >{item}</div>)}
               </div>                
             </div>
             <div className='main__test-list flex flex-col justify-between w-full gap-3'>
