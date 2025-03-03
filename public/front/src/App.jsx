@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import TestList from './components/TestList/TestList'
+import useFetchData from './api/useFetchData';
+import styles from './styles/styles.js';
 
 const titleList = ['NAME', 'TYPE', 'STATUS', 'SITE'] 
  // особый порядок для статуса
@@ -21,7 +23,7 @@ function App() {
   const [sortOrder, setSortOrder] = useState({column: 'name', direction: 'asc'})
 
 
-  // ИЗВЛЕЧЕНИЕ ДОМ
+  // ИЗВЛЕЧЕНИЕ ДОМЕНА ИЗ URL
   function extractDomain(url) {
     if (typeof url !== 'string') {
       return null;
@@ -86,83 +88,33 @@ function App() {
     return setBoardEmpty(true)
   } else {
     return setBoardEmpty(false)
-  }}, [renderedTests])  
-
-  // useEffect(() => {
-  //   async function fetchData() {     
-  //       try {
-  //         const promise1 =  await fetch('http://localhost:3100/sites').then(res => res.json()).then(data => {
-  //           setSites(data.map((item)=>{
-  //               return {...item, exName: extractDomain(item.url)}
-  //             }))
-  //             return sites
-  //           }).catch((err) => console.error('Error fetching sites:', err));    
-        
-  //           const promise2 = await fetch('http://localhost:3100/tests').then(res => res.json()).then(data => setTests(data)).catch((error) => console.error('Error fetching tests:', error));
-  //           // НЕ РАБОТАЕТ
-  //          if (tests.length > 0 && sites.length > 0) setTests(prev => 
-  //               prev.map(item =>{ return {...item, site: sites.filter(site => site.id === item.siteId)?.exName}}));
-  //       } catch (err) {
-  //         console.error('Error fetching data:', err);
-  //       }           
-    
-  //   }
-  //   fetchData()     
-  // }, [])
-
-  useEffect(() => {
-    async function fetchData() {
-       try {
-          const sitesResponse = await fetch('http://localhost:3100/sites');
-          const sitesData = await sitesResponse.json();
-          const sites = sitesData.map(item => ({
-             ...item,
-             exName: extractDomain(item.url)
-          }));
- 
-          const testsResponse = await fetch('http://localhost:3100/tests');
-          const testsData = await testsResponse.json();
-          
-          setSites(sites);
-          setTests(testsData);
- 
-          if (testsData.length > 0 && sites.length > 0) {
-             setTests(prev => 
-                prev.map(item => ({
-                   ...item,
-                   site: sites.find(site => site.id === item.siteId)?.exName
-                }))
-             );
-          }
-       } catch (err) {
-          console.error('Error fetching data:', err);
-       }
-    }
-    fetchData();
- }, []);
+  }}, [renderedTests])    
+  
+  // Кастомный хук для получения данных с сервера
+  useFetchData(extractDomain, setSites, setTests)
   
   // РЕНДЕРЛИСТ ТЕСТОВ
   useEffect(() => {setRenderedTests(filteredTests.length===0 ? tests : filteredTests)}, [filteredTests,tests])
 
   return (
-    <div className='container bg-slate-100 h-screen w-full flex flex-col items-center text-slate-500'>
-      <header className='font-bold flex justify-left'><div className='font-bold flex justify-left'>Dashboard</div></header>
-      <main className='flex flex-col justify-between w-full text-xl'>      
+    <div className={styles.container}>
+      <header className='w-full'><div className={styles.dashboardDiv}>Dashboard</div></header>
+      <main className={styles.main}>      
         <div className='input__container h-20 relative'>           
-          <span className="input__span absolute z-4 top-5 left-3 text-slate-200"><img src='/images/search.png' alt='search' className='w-5 h-5'/></span>
-          <input value={inputText} type='text' placeholder='What test are you looking for?' onChange={(e) => search(e.target.value)} className='input relative rounded bg-white w-full h-10 pl-10'/>
-          <span className="input__span_right absolute z-3 top-3 right-5 text-slate-300">{renderedTests.length} tests</span>
+          <span className={styles.searchIcon}><img src='/images/search.png' alt='search' className='w-5 h-5'/></span>
+          <input value={inputText} type='text' placeholder='What test are you looking for?' onChange={(e) => search(e.target.value)} className={styles.input}/>
+          <span className={styles.inputResults}>{renderedTests.length} tests</span>
         </div> 
-        { boardEmpty ?  <div className='main__empty-board flex flex-col justify-center items-center text-center text-2xl mt-50'><p>Your search did not match any results.</p><p className='btn_reset bg-green-400 rounded-md' onClick={search.bind(this, '')}>Reset</p></div>       
+        { boardEmpty ?  <div className={styles.emptyBoardStyle}><p>Your search did not match any results.</p><p className='btn_reset bg-green-400 rounded-md' onClick={search.bind(this, '')}>Reset</p></div>       
           :
           <div className='main'>          
             <div>
-              <div className='main__titles-list grid grid-cols-8 w-full gap-3'>
+              <div className={styles.titleListStyle}>
                 {titleList.map(item => <div key={item} onClick={()=>{handleListFilter(item.toLowerCase())}} className={`main__titles cursor-pointer ${item === 'NAME' ? 'col-span-3' : 'col-span-1'}`}
                 >{item}</div>)}
               </div>                
             </div>
-            <div className='main__test-list flex flex-col justify-between w-full gap-3'>
+            <div className={styles.testListStyle}>
               {renderedTests.map(item => <TestList key={item.id} item={item} />)}
             </div>
           </div>  
