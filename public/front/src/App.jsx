@@ -105,6 +105,8 @@ function App() {
     }
     fetchData()     
   }, [])
+
+  
   
   // РЕНДЕРЛИСТ ТЕСТОВ
   useEffect(() => {setRenderedTests(filteredTests.length===0 ? tests : filteredTests)}, [filteredTests,tests])

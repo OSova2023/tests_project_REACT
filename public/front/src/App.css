@@ -83,7 +83,7 @@
     font-weight: 400;
   }  
 
-  a {
+  a, a:hover {
     font-family: Roboto;
     font-size: 14px;
     color: #fff;
@@ -120,7 +120,6 @@
   
 .main__test-item {
   height: 70px;
-
 }
 
 .main__titles-list {
