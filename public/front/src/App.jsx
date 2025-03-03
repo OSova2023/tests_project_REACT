@@ -3,6 +3,7 @@ import './App.css'
 import TestList from './components/TestList/TestList'
 import useFetchData from './api/useFetchData';
 import styles from './styles/styles.js';
+import TestItems from './components/testItems/TestItems.jsx';
 
 const titleList = ['NAME', 'TYPE', 'STATUS', 'SITE'] 
  // особый порядок для статуса
@@ -22,6 +23,7 @@ function App() {
   const [boardEmpty, setBoardEmpty] = useState(false)
   const [sortOrder, setSortOrder] = useState({column: 'name', direction: 'asc'})
 
+  const emptyComponent = <div className={styles.emptyBoardStyle}><p>Your search did not match any results.</p><p className='btn_reset bg-green-400 rounded-md' onClick={search.bind(this, '')}>Reset</p></div>
 
   // ИЗВЛЕЧЕНИЕ ДОМЕНА ИЗ URL
   function extractDomain(url) {
@@ -105,20 +107,7 @@ function App() {
           <input value={inputText} type='text' placeholder='What test are you looking for?' onChange={(e) => search(e.target.value)} className={styles.input}/>
           <span className={styles.inputResults}>{renderedTests.length} tests</span>
         </div> 
-        { boardEmpty ?  <div className={styles.emptyBoardStyle}><p>Your search did not match any results.</p><p className='btn_reset bg-green-400 rounded-md' onClick={search.bind(this, '')}>Reset</p></div>       
-          :
-          <div className='main'>          
-            <div>
-              <div className={styles.titleListStyle}>
-                {titleList.map(item => <div key={item} onClick={()=>{handleListFilter(item.toLowerCase())}} className={`main__titles cursor-pointer ${item === 'NAME' ? 'col-span-3' : 'col-span-1'}`}
-                >{item}</div>)}
-              </div>                
-            </div>
-            <div className={styles.testListStyle}>
-              {renderedTests.map(item => <TestList key={item.id} item={item} />)}
-            </div>
-          </div>  
-        }
+        { boardEmpty ? emptyComponent : <TestItems handleListFilter={handleListFilter} renderedTests={ renderedTests} titleList={titleList}/>}
       </main>  
     </div>
   )
